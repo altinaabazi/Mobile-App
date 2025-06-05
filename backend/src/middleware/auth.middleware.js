@@ -1,5 +1,5 @@
-import { jwt } from "jsonwebtoken";
-import User from "../models/User";
+import  jwt  from "jsonwebtoken";
+import User from "../models/User.js";
 
 
 // const response = await fetch(`http://localhost:3000/api/books`,{
