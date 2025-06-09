@@ -1,22 +1,22 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Platform, KeyboardAvoidingView, Alert } from 'react-native'
 import styles from "../../assets/styles/login.styles"
 import { useState } from 'react'
 import COLORS from '../../constants/colors';
 import {Ionicons} from "@expo/vector-icons";
 import { Image } from 'react-native';
 import { Link } from 'expo-router';
+import { useAuthStore } from '../../store/authStore';
 
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handeLogin = () => {
-    fetch("http://loacalhost:3000/api/auth/login",{
-      
-    })
+  const {isLoading,login} = useAuthStore();
+  
+  const handeLogin =async () => {
+    const result = await login(email,password);
+    if(!result.success) Alert.alert("Error" , result.error);
 
   };
   return (
