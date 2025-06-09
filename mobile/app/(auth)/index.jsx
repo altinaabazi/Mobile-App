@@ -13,7 +13,12 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handeLogin = () => {}
+  const handeLogin = () => {
+    fetch("http://loacalhost:3000/api/auth/login",{
+      
+    })
+
+  };
   return (
     <KeyboardAvoidingView style={{flex:1}}
     behavior={Platform.OS === "ios" ? "padding" : "heighy"}>
