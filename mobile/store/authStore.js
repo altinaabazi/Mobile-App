@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { API_URL } from "../constants/api";
 export const useAuthStore = create((set) => ({
     user: null,
     token: null,
@@ -9,7 +9,8 @@ export const useAuthStore = create((set) => ({
     register: async (username, email, password) => {
         set({ isLoading: true });
         try {
-            const response = await fetch("https://mobile-app-2-3l39.onrender.com/api/auth/register", {
+            //https://mobile-app-2-3l39.onrender.com/api/auth/register
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,7 +43,8 @@ export const useAuthStore = create((set) => ({
     login: async(email,password) => {
         set({isLoading:true});
         try{
-           const response = await fetch("https://mobile-app-2-3l39.onrender.com/api/auth/login",{
+           // https://mobile-app-2-3l39.onrender.com/api/auth/login"
+           const response = await fetch(`${API_URL}/api/auth/login`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
