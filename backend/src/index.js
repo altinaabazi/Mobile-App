@@ -49,6 +49,8 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+const PORT = process.env.PORT || 5000; // fallback në 5000 nëse PORT nuk është caktuar në env
+
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(5000, () => console.log('Server running on port 5000')))
+  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
   .catch(err => console.error(err));

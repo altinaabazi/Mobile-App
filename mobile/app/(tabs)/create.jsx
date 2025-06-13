@@ -80,19 +80,33 @@ export default function Create() {
 
       const imageDataUrl = `data:${imageType};base64, ${imageBase64}`;
 
-      const response = await fetch(`https://mobile-app-2-3l39.onrender.com/api/books`,{
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          caption,
-          rating: rating.toString(),
-          image: imageDataUrl,
-        })
-      })
+      // const response = await fetch(`https://mobile-app-2-3l39.onrender.com/api/books`,{
+      //   method: "POST",
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     title,
+      //     caption,
+      //     rating: rating.toString(),
+      //     image: imageDataUrl,
+      //   })
+      // })
+      const response = await fetch(`${API_URL}/api/books`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    title,
+    caption,
+    rating: rating.toString(),
+    image: imageDataUrl,
+  }),
+});
+
       const data = await response.json();
       if(!response.ok) throw new Error(data.message || "Something went wrong")
 
