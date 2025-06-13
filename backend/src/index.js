@@ -27,8 +27,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 
-import bookRoutes from './routes/books.js';
-import authRoutes from './routes/auth.js';
+import bookRoutes from './routes/bookRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
