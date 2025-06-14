@@ -110,5 +110,56 @@ router.delete("/:id", protectRoute, async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+// Përditëso libër (edit) me kontrollin e pronësisë
+// router.put("/:id", protectRoute, async (req, res) => {
+//   console.log("PUT /api/books/:id called");
+//   console.log("User ID:", req.user._id);
+//   console.log("Param ID:", req.params.id);
+//   console.log("Body:", req.body);
+
+//   try {
+//     const book = await Book.findById(req.params.id);
+//     if (!book) {
+//       console.log("Libri nuk u gjet");
+//       return res.status(404).json("Libri nuk u gjet");
+//     }
+//     if (book.user.toString() !== req.user._id.toString()) {
+//       console.log("Nuk ke leje për të modifikuar librin");
+//       return res.status(403).json("Nuk ke leje për të modifikuar librin");
+//     }
+
+//     // Përditëso vetëm titullin në shembull
+//     book.title = req.body.title || book.title;
+
+//     const savedBook = await book.save();
+//     res.json(savedBook);
+//   } catch (error) {
+//     console.error("Gabim ne PUT /api/books/:id", error);
+//     res.status(500).json("Gabim serveri");
+//   }
+// });
+router.put("/:id", protectRoute, async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) {
+      return res.status(404).json("Libri nuk u gjet");
+    }
+    if (book.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json("Nuk ke leje për të modifikuar librin");
+    }
+
+    if (req.body.title !== undefined) book.title = req.body.title;
+    if (req.body.caption !== undefined) book.caption = req.body.caption;
+    if (req.body.rating !== undefined) book.rating = req.body.rating;
+
+    const savedBook = await book.save();
+    res.json(savedBook);
+  } catch (error) {
+    console.error("Gabim ne PUT /api/books/:id", error);
+    res.status(500).json("Gabim serveri");
+  }
+});
+
+
 
 export default router;
