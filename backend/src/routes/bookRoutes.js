@@ -61,6 +61,22 @@ router.get("/", protectRoute, async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+// bookRoute.js ose ku e ke router-in për librat
+router.get("/notifications", protectRoute, async (req, res) => {
+  try {
+    const lastChecked = req.query.lastChecked ? new Date(req.query.lastChecked) : new Date(0);
+
+    const newBooksCount = await Book.countDocuments({
+      createdAt: { $gt: lastChecked }
+    });
+
+    res.json({ newBooksCount });
+  } catch (error) {
+    console.log("Error fetching notifications", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // Merr librat e përdoruesit të loguar
 router.get("/user", protectRoute, async (req, res) => {
