@@ -79,6 +79,15 @@ router.get("/notifications", protectRoute, async (req, res) => {
 
 
 // Merr librat e përdoruesit të loguar
+// router.get("/user", protectRoute, async (req, res) => {
+//     try {
+//         const books = await Book.find({ user: req.user._id }).sort({ createdAt: -1 });
+//         res.json(books);
+//     } catch (error) {
+//         console.error("Get user books error:", error.message);
+//         res.status(500).json({ message: "Server error" });
+//     }
+// });
 router.get("/user", protectRoute, async (req, res) => {
     try {
         const books = await Book.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -87,6 +96,22 @@ router.get("/user", protectRoute, async (req, res) => {
         console.error("Get user books error:", error.message);
         res.status(500).json({ message: "Server error" });
     }
+});
+
+// Pastaj vetëm pas këtij, endpoint për libër me id
+router.get("/:id", protectRoute, async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).populate("user", "username profileImage");
+
+    if (!book) {
+      return res.status(404).json({ message: "Libri nuk u gjet" });
+    }
+
+    res.json({ book });
+  } catch (error) {
+    console.error("Gabim në GET /api/books/:id", error);
+    res.status(500).json({ message: "Gabim serveri" });
+  }
 });
 
 // Fshije libër me kontrollin e pronësisë

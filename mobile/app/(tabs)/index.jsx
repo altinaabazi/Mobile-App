@@ -1,18 +1,21 @@
 import { 
-  View, Text, TouchableOpacity, FlatList, ActivityIndicator, Image, StyleSheet 
+  View, Text, TouchableOpacity, FlatList, ActivityIndicator, Image, StyleSheet, Pressable 
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { Ionicons } from '@expo/vector-icons'
-import COLORS from '../../constants/colors' // përdor ngjyrat nga aty
+import COLORS from '../../constants/colors'
 import { useBookStore } from '../../store/bookStore'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback } from 'react'
+import { useRouter } from 'expo-router';
+
 export default function Home() {
   const { logout, token } = useAuthStore();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
- const { shouldRefresh, resetRefresh } = useBookStore()
+  const { shouldRefresh, resetRefresh } = useBookStore();
+  const router = useRouter();
 
   const fetchBooks = async () => {
     setLoading(true);
@@ -35,32 +38,36 @@ export default function Home() {
     }
   };
 
-useFocusEffect(
-  useCallback(() => {
-    fetchBooks()
-    if (shouldRefresh) resetRefresh()
-  }, [shouldRefresh])
-)
+  useFocusEffect(
+    useCallback(() => {
+      fetchBooks()
+      if (shouldRefresh) resetRefresh()
+    }, [shouldRefresh])
+  );
+
   const renderBookItem = ({ item }) => (
-    <View style={styles.bookCard}>
-      {/* Nëse ke imazhe për librat, mund ta shfaqësh me <Image> */}
-      {/* <Image source={{ uri: item.imageUrl }} style={styles.bookImage} /> */}
+    <Pressable 
+      onPress={() => router.push(`/book/${item._id}`)} 
+      style={({ pressed }) => [
+        styles.bookCard, 
+        pressed && { opacity: 0.7 }
+      ]}
+    >
+      {/* Mund t'i shtosh një imazh nëse ke url në item.image */}
+      {/* <Image source={{ uri: item.image }} style={styles.bookImage} /> */}
       <View style={styles.bookInfo}>
-        <Text style={styles.bookTitle}>{item.title}</Text>
-        <Text style={styles.bookCaption}>{item.caption}</Text>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={16} color={COLORS.starYellow} />
-          <Text style={styles.ratingText}>{item.rating}</Text>
-        </View>
+        <Text style={styles.bookTitle} numberOfLines={2}>{item.title}</Text>
+        <Text style={styles.bookCaption} numberOfLines={3}>{item.caption}</Text>
       </View>
-    </View>
+      <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
+    </Pressable>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Your Book List</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <TouchableOpacity style={styles.logoutButton} onPress={logout} activeOpacity={0.8}>
           <Ionicons name="log-out-outline" size={22} color={COLORS.white} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
@@ -91,68 +98,72 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     backgroundColor: COLORS.backgroundLight,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
+ header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+    paddingHorizontal: 0, // pa padding ekstra
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.primaryDark,
+    fontSize: 32,
+    fontWeight: "bold",
+    color: COLORS.primary,
   },
   logoutButton: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.primary,
+    flexDirection: "row",
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 30,
-    alignItems: 'center',
+    backgroundColor: COLORS.primary, // ngjyra kryesore tëndë
+    alignItems: "center",
   },
   logoutText: {
     color: COLORS.white,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 6,
+    fontSize: 16,
   },
+
   bookCard: {
     flexDirection: 'row',
     backgroundColor: COLORS.white,
-    padding: 15,
-    borderRadius: 15,
-    marginBottom: 15,
+    padding: 20,
+    borderRadius: 20,
+    marginBottom: 18,
+    alignItems: 'center',
     shadowColor: COLORS.black,
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
   bookInfo: {
     flex: 1,
+    marginRight: 10,
   },
   bookTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: COLORS.primaryDark,
   },
   bookCaption: {
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.textSecondary,
-    marginVertical: 6,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingText: {
-    marginLeft: 4,
-    fontWeight: '600',
-    color: COLORS.starYellow,
+    marginTop: 6,
+    lineHeight: 22,
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: 50,
     color: COLORS.textSecondary,
-    fontSize: 16,
+    fontSize: 18,
+  },
+  // Nëse do shtosh imazhe për kartela:
+  bookImage: {
+    width: 60,
+    height: 90,
+    borderRadius: 12,
+    marginRight: 15,
   },
 });
