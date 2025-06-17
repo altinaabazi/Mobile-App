@@ -83,36 +83,35 @@ export default function TabLayout() {
   const [newBooksCount, setNewBooksCount] = useState(0);
 
   useEffect(() => {
-  async function fetchNewBooksCount() {
-    try {
-      const lastChecked = (await AsyncStorage.getItem('lastCheckedBooks')) || new Date(0).toISOString();
-      console.log("📦 Last Checked:", lastChecked);
+    async function fetchNewBooksCount() {
+      try {
+        const lastChecked = (await AsyncStorage.getItem("lastCheckedBooks")) || new Date(0).toISOString();
+        const token = await AsyncStorage.getItem("token");
+        if (!token) return;
 
-      const token = await AsyncStorage.getItem('token'); // ose përdor Clerk auth.getToken()
-      if (!token) {
-        console.warn('❗ No auth token found');
-        return;
+        const BASE_URL = Platform.OS === "android" ? "http://10.0.2.2:5000" : "http://localhost:5000";
+
+        const response = await fetch(`${BASE_URL}/api/books/notifications?lastChecked=${lastChecked}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        if (data.newBooksCount) setNewBooksCount(data.newBooksCount);
+        else setNewBooksCount(0);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
       }
-
-      const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-
-      const response = await fetch(`${BASE_URL}/api/books/notifications?lastChecked=${lastChecked}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      console.log("📚 New Booksss Data:", data);
-
-      if (data.newBooksCount) setNewBooksCount(data.newBooksCount);
-    } catch (error) {
-      console.error('❌ Error fetching notifications:', error);
     }
-  }
 
-  fetchNewBooksCount();
-}, []);
+    fetchNewBooksCount();
+
+    const interval = setInterval(fetchNewBooksCount, 60000); // rifresko çdo 1 minutë
+
+    return () => clearInterval(interval);
+  }, []);
+
 
 
   return (
@@ -146,9 +145,17 @@ export default function TabLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
-            tabBarBadge: newBooksCount > 0 ? newBooksCount : undefined,
           }}
         />
+         <Tabs.Screen
+        name="notifications"
+        options={{
+          title: "Notifications",
+          tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
+          tabBarBadge: newBooksCount > 0 ? newBooksCount : undefined,
+        }}
+      />
+
         <Tabs.Screen
           name="create"
           options={{

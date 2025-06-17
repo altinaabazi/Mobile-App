@@ -88,6 +88,23 @@ router.get("/notifications", protectRoute, async (req, res) => {
 //         res.status(500).json({ message: "Server error" });
 //     }
 // });
+router.get("/new", protectRoute, async (req, res) => {
+  try {
+    const since = req.query.since ? new Date(req.query.since) : new Date(0);
+
+    const newBooks = await Book.find({
+      createdAt: { $gt: since },
+    })
+      .populate("user", "username profileImage")
+      .sort({ createdAt: -1 });
+
+    res.json({ newBooks });
+  } catch (error) {
+    console.error("Error fetching new books", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 router.get("/user", protectRoute, async (req, res) => {
     try {
         const books = await Book.find({ user: req.user._id }).sort({ createdAt: -1 });

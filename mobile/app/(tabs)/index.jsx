@@ -14,29 +14,45 @@ export default function Home() {
   const { logout, token } = useAuthStore();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [notificationsCount, setNotificationsCount] = useState(0)
+
   const { shouldRefresh, resetRefresh } = useBookStore();
   const router = useRouter();
 
+  // Ruaj librat e mëparshëm për krahasim (mund ta ruash në AsyncStorage për persistencë)
+  const [previousBooks, setPreviousBooks] = useState([])
+
   const fetchBooks = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       const res = await fetch("http://10.0.2.2:5000/api/books", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
       if (res.ok) {
-        setBooks(data.books);
+        setBooks(data.books)
+
+        // Krahaso me librat e mëparshëm për libra të rinj
+        if (previousBooks.length > 0) {
+          // Numëro librat që nuk janë në previousBooks
+          const newBooks = data.books.filter(
+            (book) => !previousBooks.some((prev) => prev._id === book._id)
+          )
+          setNotificationsCount(newBooks.length)
+        }
+
+        // Përditëso librat e mëparshëm
+        setPreviousBooks(data.books)
       } else {
-        console.log("Error fetching books:", data.message);
+        console.log("Error fetching books:", data.message)
       }
     } catch (error) {
-      console.log("Fetch error:", error);
+      console.log("Fetch error:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
 
   useFocusEffect(
     useCallback(() => {
@@ -44,6 +60,14 @@ export default function Home() {
       if (shouldRefresh) resetRefresh()
     }, [shouldRefresh])
   );
+  // Kur bëhet logout, fshi njoftimet
+  const handleLogout = () => {
+    setNotificationsCount(0)
+    setBooks([])
+    setPreviousBooks([])
+    logout()
+  }
+
 
   const renderBookItem = ({ item }) => (
     <Pressable 
@@ -67,7 +91,14 @@ export default function Home() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Your Book List</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={logout} activeOpacity={0.8}>
+         {/* Shfaq numrin e njoftimeve */}
+        {notificationsCount > 0 && (
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationText}>{notificationsCount}</Text>
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={22} color={COLORS.white} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
