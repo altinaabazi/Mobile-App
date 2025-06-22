@@ -30,6 +30,7 @@ import cors from 'cors';
 import bookRoutes from './routes/bookRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/user.js";
+import adminRoutes from "./routes/admin.js"
 const app = express();
 
 // ✅ Këtu vendosim limitin e body
@@ -41,6 +42,7 @@ app.use(cors());
 app.use('/api/books', bookRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes); 
 
 // Error handler për Payload Too Large
 app.use((err, req, res, next) => {

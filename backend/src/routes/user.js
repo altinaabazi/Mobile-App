@@ -18,6 +18,7 @@ router.get("/profile", protectRoute, async (req, res) => {
         username: req.user.username,
         email: req.user.email,
         profileImage: req.user.profileImage,
+        role: req.user.role,
       },
     });
   } catch (error) {
