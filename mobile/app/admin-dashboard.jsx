@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -6,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { useAuthStore } from "../store/authStore";
 import { useRouter } from "expo-router";
@@ -16,6 +18,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [adminMessage, setAdminMessage] = useState("");
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     const verifyAdmin = async () => {
@@ -30,11 +33,8 @@ export default function AdminDashboard() {
         const token = await AsyncStorage.getItem("token");
         const res = await fetch(`http://10.0.2.2:5000/api/admin-only`, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const data = await res.json();
 
         if (!res.ok) {
@@ -52,73 +52,145 @@ export default function AdminDashboard() {
     verifyAdmin();
   }, [user]);
 
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await fetch(`http://10.0.2.2:5000/api/books/stats`, {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Gabim duke marrë statistikat:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   if (loading) {
-    return <ActivityIndicator style={{ flex: 1 }} size="large" color="#4B5563" />;
+    return <ActivityIndicator style={{ flex: 1 }} size="large" color="#007AFF" />;
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>Admin Dashboard</Text>
-        <Text style={styles.subtitle}>👋 Mirësevjen, {user?.username}!</Text>
-        <Text style={styles.message}>{adminMessage}</Text>
+        <Text style={styles.welcome}>👋 Mirësevjen, <Text style={styles.username}>{user?.username}</Text>!</Text>
+        <Text style={styles.adminMessage}>{adminMessage}</Text>
 
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        {!stats ? (
+          <ActivityIndicator size="small" color="#007AFF" />
+        ) : (
+          <View style={styles.statsContainer}>
+            <Text style={styles.statsTitle}>📊 Statistikat e librave</Text>
+
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>📚 Total libra:</Text>
+              <Text style={styles.statValue}>{stats.totalBooks}</Text>
+            </View>
+
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>🆕 Libra këtë javë:</Text>
+              <Text style={styles.statValue}>{stats.recentBooks}</Text>
+            </View>
+
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>⭐ Vlerësimi mesatar:</Text>
+              <Text style={styles.statValue}>{stats.avgRating}</Text>
+            </View>
+          </View>
+        )}
+
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton} activeOpacity={0.7}>
           <Text style={styles.backButtonText}>⬅️ Kthehu mbrapa</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
+    flexGrow: 1,
+    backgroundColor: "#F0F4FF",
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: 20,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#FFF",
     borderRadius: 20,
     padding: 24,
     width: "100%",
-    maxWidth: 360,
+    maxWidth: 400,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "#00000040",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowRadius: 6,
     elevation: 5,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#1F2937",
-    marginBottom: 4,
+    color: "#222",
+    marginBottom: 16,
   },
-  subtitle: {
-    fontSize: 16,
-    color: "#6B7280",
+  welcome: {
+    fontSize: 18,
+    color: "#555",
     marginBottom: 12,
   },
-  message: {
-    fontSize: 15,
-    color: "#374151",
-    textAlign: "center",
+  username: {
+    fontWeight: "700",
+    color: "#007AFF",
+  },
+  adminMessage: {
+    fontSize: 16,
+    fontStyle: "italic",
+    color: "#333",
     marginBottom: 20,
+    textAlign: "center",
+  },
+  statsContainer: {
+    width: "100%",
+    marginBottom: 24,
+  },
+  statsTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#007AFF",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  statRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomColor: "#E0E7FF",
+    borderBottomWidth: 1,
+  },
+  statLabel: {
+    fontSize: 16,
+    color: "#444",
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#007AFF",
   },
   backButton: {
-    marginTop: 10,
-    backgroundColor: "#E5E7EB",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 36,
+    borderRadius: 25,
   },
   backButtonText: {
-    color: "#111827",
-    fontWeight: "600",
-    fontSize: 14,
+    color: "#FFF",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });

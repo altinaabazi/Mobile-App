@@ -1,84 +1,81 @@
-import { 
-  View, Text, TouchableOpacity, FlatList, ActivityIndicator, Image, StyleSheet, Pressable 
-} from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { useAuthStore } from '../../store/authStore'
-import { Ionicons } from '@expo/vector-icons'
-import COLORS from '../../constants/colors'
-import { useBookStore } from '../../store/bookStore'
-import { useFocusEffect } from '@react-navigation/native'
-import { useCallback } from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  TextInput,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useAuthStore } from '../../store/authStore';
+import { Ionicons } from '@expo/vector-icons';
+import COLORS from '../../constants/colors';
+import { useBookStore } from '../../store/bookStore';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 
 export default function Home() {
   const { logout, token } = useAuthStore();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [notificationsCount, setNotificationsCount] = useState(0)
-
+  const [notificationsCount, setNotificationsCount] = useState(0);
   const { shouldRefresh, resetRefresh } = useBookStore();
   const router = useRouter();
-
-  // Ruaj librat e mëparshëm për krahasim (mund ta ruash në AsyncStorage për persistencë)
-  const [previousBooks, setPreviousBooks] = useState([])
+  const [previousBooks, setPreviousBooks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchBooks = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const res = await fetch("http://10.0.2.2:5000/api/books", {
+      const res = await fetch('http://10.0.2.2:5000/api/books', {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (res.ok) {
-        setBooks(data.books)
+        setBooks(data.books);
 
-        // Krahaso me librat e mëparshëm për libra të rinj
         if (previousBooks.length > 0) {
-          // Numëro librat që nuk janë në previousBooks
           const newBooks = data.books.filter(
             (book) => !previousBooks.some((prev) => prev._id === book._id)
-          )
-          setNotificationsCount(newBooks.length)
+          );
+          setNotificationsCount(newBooks.length);
         }
 
-        // Përditëso librat e mëparshëm
-        setPreviousBooks(data.books)
+        setPreviousBooks(data.books);
       } else {
-        console.log("Error fetching books:", data.message)
+        console.log('Error fetching books:', data.message);
       }
     } catch (error) {
-      console.log("Fetch error:", error)
+      console.log('Fetch error:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
 
   useFocusEffect(
     useCallback(() => {
-      fetchBooks()
-      if (shouldRefresh) resetRefresh()
+      fetchBooks();
+      if (shouldRefresh) resetRefresh();
     }, [shouldRefresh])
   );
-  // Kur bëhet logout, fshi njoftimet
-  const handleLogout = () => {
-    setNotificationsCount(0)
-    setBooks([])
-    setPreviousBooks([])
-    logout()
-  }
 
+  const handleLogout = () => {
+    setNotificationsCount(0);
+    setBooks([]);
+    setPreviousBooks([]);
+    logout();
+  };
 
   const renderBookItem = ({ item }) => (
-    <Pressable 
-      onPress={() => router.push(`/book/${item._id}`)} 
+    <Pressable
+      onPress={() => router.push(`/book/${item._id}`)}
       style={({ pressed }) => [
-        styles.bookCard, 
+        styles.bookCard,
         pressed && { opacity: 0.7 }
       ]}
     >
-      {/* Mund t'i shtosh një imazh nëse ke url në item.image */}
-      {/* <Image source={{ uri: item.image }} style={styles.bookImage} /> */}
       <View style={styles.bookInfo}>
         <Text style={styles.bookTitle} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.bookCaption} numberOfLines={3}>{item.caption}</Text>
@@ -87,28 +84,45 @@ export default function Home() {
     </Pressable>
   );
 
+  // Kërkimi
+  const filteredBooks = books.filter(book =>
+    book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    book.caption.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Your Book List</Text>
-         {/* Shfaq numrin e njoftimeve */}
         {notificationsCount > 0 && (
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationText}>{notificationsCount}</Text>
           </View>
         )}
-
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={22} color={COLORS.white} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Search Input */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search books..."
+        placeholderTextColor={COLORS.textSecondary}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
+        <ActivityIndicator
+          size="large"
+          color={COLORS.primary}
+          style={{ marginTop: 40 }}
+        />
       ) : (
         <FlatList
-          data={books}
+          data={filteredBooks}
           keyExtractor={(item) => item._id}
           renderItem={renderBookItem}
           contentContainerStyle={{ paddingBottom: 20 }}
@@ -129,33 +143,57 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     backgroundColor: COLORS.backgroundLight,
   },
- header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 30,
-    paddingHorizontal: 0, // pa padding ekstra
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     color: COLORS.primary,
   },
   logoutButton: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 30,
-    backgroundColor: COLORS.primary, // ngjyra kryesore tëndë
-    alignItems: "center",
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
   },
   logoutText: {
     color: COLORS.white,
-    fontWeight: "600",
+    fontWeight: '600',
     marginLeft: 6,
     fontSize: 16,
   },
-
+  notificationBadge: {
+    position: 'absolute',
+    top: -10,
+    right: 100,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    zIndex: 10,
+  },
+  notificationText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  searchInput: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    fontSize: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: COLORS.primaryLight,
+    color: COLORS.primaryDark,
+  },
   bookCard: {
     flexDirection: 'row',
     backgroundColor: COLORS.white,
@@ -189,12 +227,5 @@ const styles = StyleSheet.create({
     marginTop: 50,
     color: COLORS.textSecondary,
     fontSize: 18,
-  },
-  // Nëse do shtosh imazhe për kartela:
-  bookImage: {
-    width: 60,
-    height: 90,
-    borderRadius: 12,
-    marginRight: 15,
   },
 });

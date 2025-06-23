@@ -970,6 +970,47 @@ const Profile = () => {
       },
     ]);
   };
+    const saveEdit = async () => {
+    if (!editTitle.trim()) {
+      Alert.alert("Gabim", "Titulli nuk mund të jetë bosh.");
+      return;
+    }
+    const ratingNumber = parseFloat(editRating);
+    if (isNaN(ratingNumber) || ratingNumber < 0 || ratingNumber > 5) {
+      Alert.alert("Gabim", "Rating duhet të jetë numër nga 0 në 5.");
+      return;
+    }
+
+    const token = await AsyncStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_URL}/api/books/${editBookId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          caption: editCaption,
+          rating: ratingNumber,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Nuk u përditësua libri");
+      }
+
+      const updatedBook = await res.json();
+      setBooks((prev) =>
+        prev.map((book) => (book._id === editBookId ? updatedBook : book))
+      );
+      setEditModalVisible(false);
+      Alert.alert("Sukses", "Libri u përditësua me sukses");
+    } catch (error) {
+      Alert.alert("Gabim", error.message);
+    }
+  };
 
   // ───────────────────────── lifecycle ─────────────────────────
   useEffect(() => {

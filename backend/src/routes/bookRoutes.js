@@ -4,6 +4,29 @@ import Book from "../models/Book.js";
 import protectRoute from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+// ✅ Vendose këtë SIPËR `/:id`
+router.get("/stats", protectRoute, async (req, res) => {
+  try {
+    const totalBooks = await Book.countDocuments();
+    const recentBooks = await Book.countDocuments({
+      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+    });
+
+    const avgRatingData = await Book.aggregate([
+      { $group: { _id: null, avgRating: { $avg: "$rating" } } },
+    ]);
+    const avgRating = avgRatingData[0]?.avgRating || 0;
+
+    res.json({
+      totalBooks,
+      recentBooks,
+      avgRating: avgRating.toFixed(1),
+    });
+  } catch (error) {
+    console.log("Error fetching stats", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+});
 
 router.post("/", protectRoute, async (req, res) => {
     try {
@@ -196,6 +219,7 @@ router.delete("/:id", protectRoute, async (req, res) => {
 //     res.status(500).json("Gabim serveri");
 //   }
 // });
+
 router.put("/:id", protectRoute, async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
