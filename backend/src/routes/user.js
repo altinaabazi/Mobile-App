@@ -95,5 +95,13 @@ router.put("/change-password", protectRoute, async (req, res) => {
     res.status(500).json({ message: "Gabim serveri" });
   }
 });
-
+router.get("/", protectRoute, async (req, res) => {
+  try {
+    const users = await User.find().select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Gabim në marrjen e përdoruesve:", error);
+    res.status(500).json({ message: "Gabim në server" });
+  }
+});
 export default router;

@@ -44,7 +44,8 @@ import SafeScreen from "../components/SafeScreen";
 import { StatusBar } from "expo-status-bar";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
-
+import { SocketProvider } from "../context/SocketContext";
+import {ChatProvider} from "../context/ChatContext";
 export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
@@ -68,16 +69,19 @@ export default function RootLayout() {
       router.replace("/(tabs)");
     }
   }, [user, token, segments]);
-
-  return (
-    <SafeAreaProvider>
-      <SafeScreen>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="(auth)" />
-        </Stack>
-      </SafeScreen>
-      <StatusBar style="dark" />
-    </SafeAreaProvider>
-  );
+return (
+  <SocketProvider>
+    <ChatProvider>
+      <SafeAreaProvider>
+        <SafeScreen>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(auth)" />
+          </Stack>
+        </SafeScreen>
+        <StatusBar style="dark" />
+      </SafeAreaProvider>
+    </ChatProvider>
+  </SocketProvider>
+);
 }

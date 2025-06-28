@@ -77,11 +77,17 @@ import { Tabs } from 'expo-router';
 import COLORS from '../../constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useChatContext } from '../../context/ChatContext';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const [newBooksCount, setNewBooksCount] = useState(0);
+  const { totalUnread } = useChatContext();
 
+
+  useEffect(() => {
+    console.log("[TabLayout] totalUnread =", totalUnread);
+  }, [totalUnread]);
   useEffect(() => {
     async function fetchNewBooksCount() {
       try {
@@ -147,14 +153,25 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
           }}
         />
-         <Tabs.Screen
-        name="notifications"
+        <Tabs.Screen
+          name="notifications"
+          options={{
+            title: "Notifications",
+            tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
+            tabBarBadge: newBooksCount > 0 ? newBooksCount : undefined,
+          }}
+        />
+           <Tabs.Screen
+        name="chat/index"
         options={{
-          title: "Notifications",
-          tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
-          tabBarBadge: newBooksCount > 0 ? newBooksCount : undefined,
+          title: "Chat",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="chatbubble-outline" size={size} color={color} />
+          ),
+          tabBarBadge: totalUnread > 0 ? totalUnread : undefined,
         }}
       />
+
 
         <Tabs.Screen
           name="create"
