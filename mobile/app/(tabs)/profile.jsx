@@ -1105,7 +1105,7 @@ const Profile = () => {
               style={styles.buttonPrimary}
               onPress={handleChangePassword}
             >
-              <Text style={styles.buttonText}>Ndrysho Fjalëkalimin</Text>
+              <Text style={styles.buttonText}>Change Password</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonCancel}
@@ -1145,8 +1145,17 @@ const Profile = () => {
                 if (!books.length) fetchBooks();
               }}
             >
-              <Text style={styles.buttonTextSecondary}>Shfaq Librat</Text>
+              <Text style={styles.buttonTextSecondary}>Show Books</Text>
             </TouchableOpacity>
+        <TouchableOpacity
+  style={[styles.buttonSecondary, { marginTop: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }]}
+  onPress={() => router.push('/calendar')}
+>
+  <Ionicons name="calendar" size={20} color="green" style={{ marginRight: 8 }} />
+  <Text style={styles.buttonTextSecondary}>My Events</Text>
+</TouchableOpacity>
+
+
 
             {/* ──────────── admin button ──────────── */}
             {user.role === "admin" && (
@@ -1158,7 +1167,7 @@ const Profile = () => {
     onPress={() => router.push("/admin-dashboard")}
   >
     
-    <Text style={styles.buttonText}>Shko te Admin Dashboard</Text>
+    <Text style={styles.buttonText}>Dashboard</Text>
   </TouchableOpacity>
 )}
 
@@ -1169,7 +1178,7 @@ const Profile = () => {
         {booksModalVisible && (
           <View style={styles.modalOverlay}>
             <View style={styles.booksModal}>
-              <Text style={styles.modalTitle}>Librat e mi</Text>
+              <Text style={styles.modalTitle}>My Books</Text>
               <ScrollView>
                 {books.map((b) => (
                   <View key={b._id} style={styles.bookCard}>
@@ -1201,7 +1210,7 @@ const Profile = () => {
                 style={[styles.buttonCancel, { marginTop: 20 }]}
                 onPress={() => setBooksModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Mbyll</Text>
+                <Text style={styles.buttonText}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1211,7 +1220,7 @@ const Profile = () => {
         {editModalVisible && (
           <View style={styles.modalOverlay}>
             <View style={styles.editModal}>
-              <Text style={styles.modalTitle}>Edito Librin</Text>
+              <Text style={styles.modalTitle}>Edit Book</Text>
               <TextInput
                 placeholder="Titulli"
                 value={editTitle}
@@ -1232,13 +1241,13 @@ const Profile = () => {
                 style={styles.input}
               />
               <TouchableOpacity style={styles.buttonPrimary} onPress={saveEdit}>
-                <Text style={styles.buttonText}>Ruaj Ndryshimet</Text>
+                <Text style={styles.buttonText}>Save</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.buttonCancel}
                 onPress={() => setEditModalVisible(false)}
               >
-                <Text style={styles.buttonText}>Anulo</Text>
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>

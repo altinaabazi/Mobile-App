@@ -7,10 +7,10 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
 import * as FileSystem from 'expo-file-system'
-import COLORS from '../../constants/colors'
+import COLORS from '../constants/colors'
 import { useRouter } from 'expo-router'
-import { useAuthStore } from '../../store/authStore' // nëse ke token për autorizim
-import { useBookStore } from '../../store/bookStore'
+import { useAuthStore } from '../store/authStore' // nëse ke token për autorizim
+import { useBookStore } from '../store/bookStore'
 
 export default function Create() {
   const [title, setTitle] = useState('')

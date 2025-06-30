@@ -173,13 +173,13 @@ export default function TabLayout() {
       />
 
 
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="create"
           options={{
             title: 'Create',
             tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="profile"
           options={{
@@ -188,13 +188,13 @@ export default function TabLayout() {
           }}
         />
         {/* Shtesa e kalendarit */}
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="calendar"
           options={{
             title: 'Calendar',
             tabBarIcon: ({ color, size }) => <Ionicons name="calendar-outline" size={size} color={color} />,
           }}
-        />
+        /> */}
       </Tabs>
     </>
   );

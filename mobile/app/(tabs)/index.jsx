@@ -93,7 +93,14 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Your Book List</Text>
+         <TouchableOpacity
+    style={styles.createButton}
+    onPress={() => router.push('/create')} // ndrysho path sipas rutës së krijimit të librit
+  >
+    <Ionicons name="add-circle-outline" size={24} color='green' />
+    <Text style={styles.createButtonText}>Create</Text>
+  </TouchableOpacity>
+        <Text style={styles.title}>Books</Text>
         {notificationsCount > 0 && (
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationText}>{notificationsCount}</Text>
@@ -101,7 +108,7 @@ export default function Home() {
         )}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={22} color={COLORS.white} />
-          <Text style={styles.logoutText}>Logout</Text>
+          {/* <Text style={styles.logoutText}></Text> */}
         </TouchableOpacity>
       </View>
 
