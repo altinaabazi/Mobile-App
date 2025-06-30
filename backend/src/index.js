@@ -72,6 +72,7 @@ import adminRoutes from "./routes/admin.js";
 import chatRoutes from "./routes/chat.js";
 import Message from './models/message.js';
 import User from "./models/User.js";
+import eventRoutes from './routes/events.js';
 
 const app = express();
 const server = http.createServer(app); // <-- krijo http server për socket.io
@@ -293,6 +294,7 @@ app.use('/api/auth', authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
+app.use('/api/events', eventRoutes);
 
 // Error handler
 app.use((err, req, res, next) => {
