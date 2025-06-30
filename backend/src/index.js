@@ -70,7 +70,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/user.js";
 import adminRoutes from "./routes/admin.js";
 import chatRoutes from "./routes/chat.js";
-import Message from './models/message.js';
+import Message from './models/Message.js';
 import User from "./models/User.js";
 import eventRoutes from './routes/events.js';
 

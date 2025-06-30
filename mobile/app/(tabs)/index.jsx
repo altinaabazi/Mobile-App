@@ -29,7 +29,7 @@ export default function Home() {
   const fetchBooks = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://10.0.2.2:5000/api/books', {
+const res = await fetch('http://10.0.2.2:5000/api/books?page=1&limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

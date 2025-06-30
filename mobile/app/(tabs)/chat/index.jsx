@@ -950,7 +950,7 @@ const sendMessage = async () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setMessages((prev) => [...prev, res.data.newMessage]);
+      //setMessages((prev) => [...prev, res.data.newMessage]);
       setText("");
       scrollToBottom();
     } catch (err) {
