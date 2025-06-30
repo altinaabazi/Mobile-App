@@ -1,6 +1,6 @@
 import express from "express";
 import protectRoute from "../middleware/auth.middleware.js";
-import Message from "../models/message.js";
+import Message from "../models/Message.js";
 const router = express.Router();
 
 // POST /api/chat/send
