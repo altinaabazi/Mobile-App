@@ -1,37 +1,3 @@
-// import React, { createContext, useContext, useEffect, useRef } from "react";
-// import { io } from "socket.io-client";
-// import { useAuthStore } from "../store/authStore";
-
-// const SocketContext = createContext();
-
-// export const SocketProvider = ({ children }) => {
-//   const { token } = useAuthStore(); // e merr tokenin nga përdoruesi
-//   const socketRef = useRef(null);
-// useEffect(() => {
-//   if (token) {
-//     const socket = io("http://10.0.2.2:5000", { transports: ["websocket"] });
-//     socketRef.current = socket;
-
-//     socket.on("connect", () => {
-//       console.log("🔌 Socket connected with id:", socket.id);
-//       socket.emit("join", token);
-//         socket.emit("getUnreadMessages");
-
-//     });
-
-//     return () => {
-//       socket.disconnect();
-//     };
-//   }
-// }, [token]);
-
-
-//   return (
-//     <SocketContext.Provider value={socketRef.current}>
-//       {children}
-//     </SocketContext.Provider>
-//   );
-// };
 
 // export const useSocket = () => useContext(SocketContext);
 import React, { createContext, useContext, useEffect, useState } from "react";

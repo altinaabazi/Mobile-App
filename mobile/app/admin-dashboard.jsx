@@ -12,7 +12,7 @@ import {
 import { useAuthStore } from "../store/authStore";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import COLORS from "../constants/colors";
 export default function AdminDashboard() {
   const { user } = useAuthStore();
   const router = useRouter();
@@ -43,7 +43,6 @@ export default function AdminDashboard() {
 
         setAdminMessage(data.message);
       } catch (err) {
-        Alert.alert("Gabim", err.message);
       } finally {
         setLoading(false);
       }
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontWeight: "700",
-    color: "#007AFF",
+    color:  COLORS.primary,
   },
   adminMessage: {
     fontSize: 16,
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
   statsTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#007AFF",
+    color:  COLORS.primary,
     marginBottom: 12,
     textAlign: "center",
   },
@@ -180,10 +179,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#007AFF",
+    color:  COLORS.primary,
   },
   backButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: COLORS.primary,
     paddingVertical: 12,
     paddingHorizontal: 36,
     borderRadius: 25,

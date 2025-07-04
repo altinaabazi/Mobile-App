@@ -11,7 +11,7 @@ import { Calendar } from 'react-native-calendars';
 import { Picker } from '@react-native-picker/picker';
 import * as ExpoCalendar from 'expo-calendar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import COLORS from '../constants/colors';
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState('');
   const [books, setBooks] = useState([]);
@@ -185,6 +185,7 @@ export default function CalendarScreen() {
       marked: true,
       selectedColor: 'blue',
     };
+    
   }
 
   userEvents.forEach(event => {
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#00adf5',
+    backgroundColor: COLORS.primary,
     paddingVertical: 14,
     borderRadius: 10,
     marginTop: 25,

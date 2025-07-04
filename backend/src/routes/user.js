@@ -27,36 +27,14 @@ router.get("/profile", protectRoute, async (req, res) => {
   }
 });
 
-// PUT /api/users/update
-// router.put("/update", protectRoute, async (req, res) => {
-//   try {
-//     const { username, email } = req.body;
 
-//     const user = await User.findById(req.user._id);
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     user.username = username || user.username;
-//     user.email = email || user.email;
-
-//     await user.save();
-
-//     res.status(200).json({ message: "User updated successfully" });
-//   } catch (error) {
-//     console.log("Update user error:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
 router.put("/update", protectRoute, async (req, res) => {
   try {
-        console.log("Req body:", req.body);  // << shto këtë rresht
+    console.log("Req body:", req.body);
 
-    const { username, email, profileImage } = req.body; // merr edhe profileImage
+    const { username, email, profileImage } = req.body;
 
     const user = await User.findById(req.user._id);
-    
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -64,11 +42,26 @@ router.put("/update", protectRoute, async (req, res) => {
 
     user.username = username || user.username;
     user.email = email || user.email;
-    user.profileImage = profileImage || user.profileImage;  // ruaj fotoja
+
+    if (profileImage) {
+      // Kontrollo nëse profileImage është data URL (base64) ose URL
+      if (profileImage.startsWith("data:")) {
+        // Upload në Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(profileImage, {
+          folder: "profile_images", // opsionale, folder në Cloudinary
+          overwrite: true,
+          resource_type: "image",
+        });
+        user.profileImage = uploadResponse.secure_url;
+      } else {
+        // supozojmë se është URL e mëparshme, ruaj ashtu
+        user.profileImage = profileImage;
+      }
+    }
 
     await user.save();
 
-    res.status(200).json({ message: "User updated successfully" });
+    res.status(200).json({ message: "User updated successfully", profileImage: user.profileImage });
   } catch (error) {
     console.log("Update user error:", error);
     res.status(500).json({ message: "Server error" });

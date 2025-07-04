@@ -1,123 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, Text, FlatList, Image, ActivityIndicator, Platform, StyleSheet } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// type Book = {
-//   _id: string;
-//   title: string;
-//   caption: string;
-//   image: string;
-//   rating: number;
-//   createdAt: string;
-//   user?: {
-//     username: string;
-//   };
-// };
-
-// export default function NotificationsScreen() {
-//   const [books, setBooks] = useState<Book[]>([]);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     async function fetchNotifications() {
-//       try {
-//         const token = await AsyncStorage.getItem('token');
-//         if (!token) {
-//           console.warn('No token found');
-//           return;
-//         }
-
-//         const lastChecked = (await AsyncStorage.getItem('lastCheckedBooks')) || new Date(0).toISOString();
-//         const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
-
-//         const response = await fetch(`${BASE_URL}/api/books?since=${lastChecked}`, {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         });
-
-//         const data = await response.json();
-//         setBooks(data.books || []);
-
-//         // Përditëso kohën e fundit të kontrolluar
-//         await AsyncStorage.setItem('lastCheckedBooks', new Date().toISOString());
-//       } catch (error) {
-//         console.error('Error fetching notifications:', error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     }
-
-//     fetchNotifications();
-//   }, []);
-
-//   if (loading) {
-//     return (
-//       <View style={styles.center}>
-//         <ActivityIndicator size="large" color="#555" />
-//       </View>
-//     );
-//   }
-
-//   if (books.length === 0) {
-//     return (
-//       <View style={styles.center}>
-//         <Text style={styles.emptyText}>Nuk ka libra të rinj.</Text>
-//       </View>
-//     );
-//   }
-
-//   return (
-//     <FlatList
-//       data={books}
-//       keyExtractor={(item) => item._id}
-//       renderItem={({ item }) => (
-//         <View style={styles.card}>
-//           <Image source={{ uri: item.image }} style={styles.image} />
-//           <View style={styles.info}>
-//             <Text style={styles.title}>{item.title}</Text>
-//             <Text style={styles.caption}>{item.caption}</Text>
-//             <Text style={styles.rating}>⭐ {item.rating}/5</Text>
-//             {item.user && <Text style={styles.user}>Nga: {item.user.username}</Text>}
-//           </View>
-//         </View>
-//       )}
-//     />
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   center: {
-//     flex: 1, justifyContent: 'center', alignItems: 'center',
-//   },
-//   emptyText: {
-//     fontSize: 16, color: '#555',
-//   },
-//   card: {
-//     flexDirection: 'row',
-//     padding: 10,
-//     borderBottomColor: '#ddd',
-//     borderBottomWidth: 1,
-//   },
-//   image: {
-//     width: 60, height: 90, borderRadius: 8,
-//   },
-//   info: {
-//     marginLeft: 10, justifyContent: 'center', flex: 1,
-//   },
-//   title: {
-//     fontSize: 16, fontWeight: 'bold',
-//   },
-//   caption: {
-//     fontSize: 14, color: '#666',
-//   },
-//   rating: {
-//     fontSize: 12, color: '#888',
-//   },
-//   user: {
-//     fontSize: 12, color: '#aaa', marginTop: 4,
-//   },
-// });
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -191,28 +71,33 @@ export default function NotificationsScreen() {
   }
 
   return (
-  <View style={{ flex: 1 }}>
-    <Text style={styles.header}>📚 Njoftimet e Librave të Rinj</Text>
-    <FlatList
-      data={books}
-      keyExtractor={(item) => item._id}
-      contentContainerStyle={styles.listContainer}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Image source={{ uri: item.image }} style={styles.image} />
-          <View style={styles.info}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.caption}>{item.caption}</Text>
-            <Text style={styles.rating}>⭐ {item.rating}/5</Text>
-            {item.user && (
-              <Text style={styles.user}>Nga: {item.user.username}</Text>
-            )}
+    <View style={{ flex: 1 }}>
+      <Text style={styles.header}>📚 Njoftimet e Librave të Rinj</Text>
+      <FlatList
+        data={books}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={styles.listContainer}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={item.image ? { uri: item.image } : require('../../assets/images/photo.jpg')}
+              style={styles.image}
+              resizeMode="cover"
+            />
+            <View style={styles.info}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.caption}>{item.caption}</Text>
+              <Text style={styles.rating}>⭐ {item.rating}/5</Text>
+              {item.user && (
+                <Text style={styles.user}>Nga: {item.user.username}</Text>
+              )}
+            </View>
           </View>
-        </View>
-      )}
-    />
-  </View>
-);
+        )}
+
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -229,13 +114,13 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   header: {
-  fontSize: 22,
-  fontWeight: 'bold',
-  textAlign: 'center',
-  marginTop: 20,
-  marginBottom: 10,
-  color: '#222',
-},
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+    color: '#222',
+  },
 
   card: {
     flexDirection: 'row',

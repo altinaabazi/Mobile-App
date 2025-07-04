@@ -29,32 +29,28 @@ router.get("/stats", protectRoute, async (req, res) => {
 });
 
 router.post("/", protectRoute, async (req, res) => {
-    try {
-        const { title, caption, rating, image } = req.body;
+  try {
+    const { title, caption, rating, image } = req.body;
 
-        if (!image || !title || !caption || !rating) {
-            return res.status(400).json({ message: "Please provide all fields" });
-        }
-
-        // image duhet të jetë base64 ose url i cloudinary në frontend
-        const uploadResponse = await cloudinary.uploader.upload(image);
-        const imageUrl = uploadResponse.secure_url;
-
-        const newBook = new Book({
-            title,
-            caption,
-            rating,
-            image: imageUrl,
-            user: req.user._id,
-        });
-
-        await newBook.save();
-
-        res.status(201).json(newBook);
-    } catch (error) {
-        console.log("error creating book", error);
-        res.status(500).json({ message: error.message });
+    if (!image || !title || !caption || !rating) {
+      return res.status(400).json({ message: "Please provide all fields" });
     }
+
+    // image është tashmë URL nga Cloudinary
+    const newBook = new Book({
+      title,
+      caption,
+      rating,
+      image,
+      user: req.user._id,
+    });
+
+    await newBook.save();
+    res.status(201).json(newBook);
+  } catch (error) {
+    console.log("error creating book", error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 // GET me pagination
@@ -100,17 +96,6 @@ router.get("/notifications", protectRoute, async (req, res) => {
   }
 });
 
-
-// Merr librat e përdoruesit të loguar
-// router.get("/user", protectRoute, async (req, res) => {
-//     try {
-//         const books = await Book.find({ user: req.user._id }).sort({ createdAt: -1 });
-//         res.json(books);
-//     } catch (error) {
-//         console.error("Get user books error:", error.message);
-//         res.status(500).json({ message: "Server error" });
-//     }
-// });
 router.get("/new", protectRoute, async (req, res) => {
   try {
     const since = req.query.since ? new Date(req.query.since) : new Date(0);

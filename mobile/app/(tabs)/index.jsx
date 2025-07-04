@@ -1,3 +1,9 @@
+//arkitektura ne front MVVM
+// View (UI)   app/, components/ 
+// ViewModel (State mgmt) context/, store/ 
+// Model (Data/API) constants/api.js, bookStore.js 
+// Assets assets/ 
+
 import {
   View,
   Text,
@@ -7,6 +13,7 @@ import {
   TextInput,
   StyleSheet,
   Pressable,
+  Image,
 } from 'react-native';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '../../store/authStore';
@@ -15,6 +22,34 @@ import COLORS from '../../constants/colors';
 import { useBookStore } from '../../store/bookStore';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+
+const BookCard = ({ item, onPress }) => {
+  const [imageUri, setImageUri] = React.useState(item.image || null);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.bookCard, pressed && { opacity: 0.7 }]}
+    >
+      <Image
+        source={imageUri ? { uri: imageUri } : require('../../assets/images/photo.jpg')}
+        style={styles.bookImage}
+        resizeMode="cover"
+        onError={() => setImageUri(null)}
+      />
+      <View style={styles.bookInfo}>
+        <Text style={styles.bookTitle} numberOfLines={2}>
+          {item.title}
+        </Text>
+        <Text style={styles.bookCaption} numberOfLines={3}>
+          {item.caption}
+        </Text>
+      </View>
+      <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
+    </Pressable>
+  );
+};
+
 
 export default function Home() {
   const { logout, token } = useAuthStore();
@@ -29,7 +64,7 @@ export default function Home() {
   const fetchBooks = async () => {
     setLoading(true);
     try {
-const res = await fetch('http://10.0.2.2:5000/api/books?page=1&limit=100', {
+      const res = await fetch('http://10.0.2.2:5000/api/books?page=1&limit=100', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -69,50 +104,42 @@ const res = await fetch('http://10.0.2.2:5000/api/books?page=1&limit=100', {
   };
 
   const renderBookItem = ({ item }) => (
-    <Pressable
+    <BookCard
+      item={item}
       onPress={() => router.push(`/book/${item._id}`)}
-      style={({ pressed }) => [
-        styles.bookCard,
-        pressed && { opacity: 0.7 }
-      ]}
-    >
-      <View style={styles.bookInfo}>
-        <Text style={styles.bookTitle} numberOfLines={2}>{item.title}</Text>
-        <Text style={styles.bookCaption} numberOfLines={3}>{item.caption}</Text>
-      </View>
-      <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
-    </Pressable>
+    />
   );
 
-  // Kërkimi
-  const filteredBooks = books.filter(book =>
-    book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    book.caption.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBooks = books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.caption.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-         <TouchableOpacity
-    style={styles.createButton}
-    onPress={() => router.push('/create')} // ndrysho path sipas rutës së krijimit të librit
-  >
-    <Ionicons name="add-circle-outline" size={24} color='green' />
-    <Text style={styles.createButtonText}>Create</Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => router.push('/create')}
+        >
+          <Ionicons name="add-circle-outline" size={24} color="green" />
+          <Text style={styles.createButtonText}>Create</Text>
+        </TouchableOpacity>
+
         <Text style={styles.title}>Books</Text>
+
         {notificationsCount > 0 && (
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationText}>{notificationsCount}</Text>
           </View>
         )}
+
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={22} color={COLORS.white} />
-          {/* <Text style={styles.logoutText}></Text> */}
         </TouchableOpacity>
       </View>
 
-      {/* Search Input */}
       <TextInput
         style={styles.searchInput}
         placeholder="Search books..."
@@ -156,10 +183,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  createButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  createButtonText: {
+    color: 'green',
+    fontWeight: 'bold',
+    marginLeft: 6,
+    fontSize: 16,
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: COLORS.primary,
+    flex: 1,
+    textAlign: 'center',
   },
   logoutButton: {
     flexDirection: 'row',
@@ -168,12 +208,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
-  },
-  logoutText: {
-    color: COLORS.white,
-    fontWeight: '600',
-    marginLeft: 6,
-    fontSize: 16,
   },
   notificationBadge: {
     position: 'absolute',
@@ -214,9 +248,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
+  bookImage: {
+    width: 70,
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: '#eee',
+    marginRight: 15,
+  },
   bookInfo: {
     flex: 1,
-    marginRight: 10,
   },
   bookTitle: {
     fontSize: 20,
